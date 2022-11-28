@@ -9,11 +9,11 @@ Users will be able to give players a name, age, nationality, and overall rating.
 
 In the terminal, run the following command:
 ```aidl
-git clone https://github.com/jcxsanchz/soccer-player-api-project.git
+git clone https://github.com/jcxsanchz/soccer-player-fastapi-1.git
 ```
-then, cd into soccer-player-api-project:
+then, cd into soccer-player-fastapi-1:
 ```aidl
-cd soccer-player-api-project
+cd soccer-player-fastapi-1
 ```
 create and activate a virtual environment within your IDE with the following commands:
 ```aidl
