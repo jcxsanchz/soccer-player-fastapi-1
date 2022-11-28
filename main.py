@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-
 import models.table
-from api import soccer_api
+from routers import players, user
 import uvicorn
 from api.database import engine
 models.table.Base.metadata.create_all(bind=engine)
@@ -10,7 +9,8 @@ models.table.Base.metadata.create_all(bind=engine)
 # instance
 api = FastAPI()
 
-api.include_router(soccer_api.router)
+api.include_router(players.router)
+api.include_router(user.router)
 
 if __name__ == '__main__':
     uvicorn.run(api, port=8000, host='127.0.0.1')

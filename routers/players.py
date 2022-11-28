@@ -3,13 +3,11 @@ from fastapi import status, HTTPException, Response, Depends
 from typing import List
 import models.table
 from api.database import get_db
-from models.schemas import CreatePlayer, PlayerResponse, CreateUser, UserOut
+from models.schemas import CreatePlayer, PlayerResponse
 from sqlalchemy.orm import Session
-import utils
+
 
 router = fastapi.APIRouter()
-
-# create_players_table.create_table()
 
 
 # path operation or route. route path
@@ -93,18 +91,3 @@ def update_player(id: int, player: CreatePlayer, db: Session = Depends(get_db)):
     db.commit()
 
     return player_query.first()
-
-
-@router.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserOut)
-def create_user(user: CreateUser, db: Session = Depends(get_db)):
-
-    # hash the password - user.password
-    hashed_password = utils.hash_password(user.password)
-    user.password = hashed_password
-
-    new_user = models.table.User(**user.dict())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
