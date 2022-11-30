@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import models.table
-from routers import players, user
+from routers import players, user, auth
 import uvicorn
 from api.database import engine
 
@@ -12,6 +12,7 @@ api = FastAPI()
 
 api.include_router(players.router)
 api.include_router(user.router)
+api.include_router(auth.router)
 
 
 # path operation or route. route path
