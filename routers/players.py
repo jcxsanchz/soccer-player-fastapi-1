@@ -15,7 +15,7 @@ router = fastapi.APIRouter(
 
 
 @router.get('/', response_model=List[PlayerResponse])
-def get_players(db: Session = Depends(get_db)):
+def get_players(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""SELECT * FROM players""")
     # players = cursor.fetchall()
     players = db.query(models.table.Player).all()
@@ -24,13 +24,13 @@ def get_players(db: Session = Depends(get_db)):
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=PlayerResponse)
 def add_player(player: CreatePlayer, db: Session = Depends(get_db),
-               get_current_user: int = Depends(oauth2.get_current_user)):
+               current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""INSERT INTO players (player_name, player_age, player_nationality, player_rating)
     # VALUES (%s, %s, %s, %s) RETURNING *
     # """, (player.player_name, player.player_age, player.player_nationality, player.player_rating))
     # new_player_dict = player.dict()
     # conn.commit()
-
+    print(current_user.email)
     new_player_dict = models.table.Player(**player.dict())
     db.add(new_player_dict)
     db.commit()
@@ -40,7 +40,7 @@ def add_player(player: CreatePlayer, db: Session = Depends(get_db),
 
 # id path parameter will allow user to see specific player. id must be converted to list for it to work
 @router.get('/{id}', response_model=PlayerResponse)
-def get_player(id: int, db: Session = Depends(get_db)):
+def get_player(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""SELECT * FROM players WHERE player_id=%s""", [id])
     # found_player = cursor.fetchone()
 
@@ -53,7 +53,7 @@ def get_player(id: int, db: Session = Depends(get_db)):
 
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_player(id: int, db: Session = Depends(get_db)):
+def delete_player(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""DELETE FROM players WHERE player_id=%s RETURNING *""", [id])
     # deleted_player = cursor.fetchone()
     # conn.commit()
@@ -70,7 +70,8 @@ def delete_player(id: int, db: Session = Depends(get_db)):
 
 
 @router.put('/{id}', response_model=PlayerResponse)
-def update_player(id: int, player: CreatePlayer, db: Session = Depends(get_db)):
+def update_player(id: int, player: CreatePlayer, db: Session = Depends(get_db),
+                  current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""UPDATE players SET player_name=%s, player_age=%s, player_nationality=%s, player_rating=%s WHERE
     # player_id=%s RETURNING *""",
     #                (player.player_name, player.player_age, player.player_nationality, player.player_rating, id))
