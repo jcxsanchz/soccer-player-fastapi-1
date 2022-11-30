@@ -6,10 +6,13 @@ from models.schemas import CreateUser, UserOut
 from sqlalchemy.orm import Session
 import utils
 
-router = fastapi.APIRouter()
+router = fastapi.APIRouter(
+    prefix='/users',
+    tags=['Users']
+)
 
 
-@router.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserOut)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserOut)
 def create_user(user: CreateUser, db: Session = Depends(get_db)):
     # hash the password - user.password
     hashed_password = utils.hash_user_password(user.password)
@@ -23,7 +26,7 @@ def create_user(user: CreateUser, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get('/users/{id}', response_model=UserOut)
+@router.get('/{id}', response_model=UserOut)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.table.User).filter(models.table.User.user_id == id).first()
 

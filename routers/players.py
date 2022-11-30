@@ -7,16 +7,13 @@ from models.schemas import CreatePlayer, PlayerResponse
 from sqlalchemy.orm import Session
 
 
-router = fastapi.APIRouter()
+router = fastapi.APIRouter(
+    prefix='/players',
+    tags=['Players']
+)
 
 
-# path operation or route. route path
-@router.get('/')
-def root():
-    return {"message": "Welcome to Soccer Manager!"}
-
-
-@router.get('/players', response_model=List[PlayerResponse])
+@router.get('/', response_model=List[PlayerResponse])
 def get_players(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM players""")
     # players = cursor.fetchall()
@@ -24,7 +21,7 @@ def get_players(db: Session = Depends(get_db)):
     return players
 
 
-@router.post('/players', status_code=status.HTTP_201_CREATED, response_model=PlayerResponse)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=PlayerResponse)
 def add_player(player: CreatePlayer, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO players (player_name, player_age, player_nationality, player_rating)
     # VALUES (%s, %s, %s, %s) RETURNING *
@@ -40,7 +37,7 @@ def add_player(player: CreatePlayer, db: Session = Depends(get_db)):
 
 
 # id path parameter will allow user to see specific player. id must be converted to list for it to work
-@router.get('/players/{id}', response_model=PlayerResponse)
+@router.get('/{id}', response_model=PlayerResponse)
 def get_player(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM players WHERE player_id=%s""", [id])
     # found_player = cursor.fetchone()
@@ -53,7 +50,7 @@ def get_player(id: int, db: Session = Depends(get_db)):
     return found_player
 
 
-@router.delete('/players/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_player(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""DELETE FROM players WHERE player_id=%s RETURNING *""", [id])
     # deleted_player = cursor.fetchone()
@@ -70,7 +67,7 @@ def delete_player(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put('/players/{id}', response_model=PlayerResponse)
+@router.put('/{id}', response_model=PlayerResponse)
 def update_player(id: int, player: CreatePlayer, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE players SET player_name=%s, player_age=%s, player_nationality=%s, player_rating=%s WHERE
     # player_id=%s RETURNING *""",
