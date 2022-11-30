@@ -2,6 +2,7 @@ import fastapi
 from fastapi import status, HTTPException, Response, Depends
 from typing import List
 import models.table
+import oauth2
 from api.database import get_db
 from models.schemas import CreatePlayer, PlayerResponse
 from sqlalchemy.orm import Session
@@ -22,7 +23,8 @@ def get_players(db: Session = Depends(get_db)):
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=PlayerResponse)
-def add_player(player: CreatePlayer, db: Session = Depends(get_db)):
+def add_player(player: CreatePlayer, db: Session = Depends(get_db),
+               get_current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""INSERT INTO players (player_name, player_age, player_nationality, player_rating)
     # VALUES (%s, %s, %s, %s) RETURNING *
     # """, (player.player_name, player.player_age, player.player_nationality, player.player_rating))
