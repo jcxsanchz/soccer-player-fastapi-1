@@ -17,7 +17,7 @@ router = fastapi.APIRouter(
 def get_players(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute("""SELECT * FROM players""")
     # players = cursor.fetchall()
-    players = db.query(models.table.Player).filter(models.table.Player.player_id == current_user.user_id).all()
+    players = db.query(models.table.Player).filter(models.table.Player.owner_id == current_user.user_id).all()
     return players
 
 
