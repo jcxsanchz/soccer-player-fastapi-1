@@ -48,6 +48,10 @@ def get_player(id: int, db: Session = Depends(get_db), current_user: int = Depen
     if not found_player:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"player with id {id} was not found")
+
+    if found_player.owner_id != current_user.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
+
     return found_player
 
 
