@@ -7,7 +7,6 @@ from api.database import get_db
 from models.schemas import CreatePlayer, PlayerResponse
 from sqlalchemy.orm import Session
 
-
 router = fastapi.APIRouter(
     prefix='/players',
     tags=['Players']
@@ -30,8 +29,8 @@ def add_player(player: CreatePlayer, db: Session = Depends(get_db),
     # """, (player.player_name, player.player_age, player.player_nationality, player.player_rating))
     # new_player_dict = player.dict()
     # conn.commit()
-    print(current_user.email)
-    new_player_dict = models.table.Player(**player.dict())
+
+    new_player_dict = models.table.Player(owner_id=current_user.user_id, **player.dict())
     db.add(new_player_dict)
     db.commit()
     db.refresh(new_player_dict)
@@ -58,12 +57,18 @@ def delete_player(id: int, db: Session = Depends(get_db), current_user: int = De
     # deleted_player = cursor.fetchone()
     # conn.commit()
 
-    deleted_player = db.query(models.table.Player).filter(models.table.Player.player_id == id)
-    if deleted_player.first() is None:
+    deleted_player_query = db.query(models.table.Player).filter(models.table.Player.player_id == id)
+
+    deleted_player = deleted_player_query.first()
+
+    if deleted_player == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"player with id: {id} does not exist.")
 
-    deleted_player.delete(synchronize_session=False)
+    if deleted_player.owner_id != current_user.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
+
+    deleted_player_query.delete(synchronize_session=False)
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -85,6 +90,9 @@ def update_player(id: int, player: CreatePlayer, db: Session = Depends(get_db),
     if player_to_update is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"player with id: {id} does not exist.")
+
+    if player_to_update.owner_id != current_user.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
 
     player_query.update(player.dict(), synchronize_session=False)
 
